@@ -1,0 +1,9 @@
+//Dallas Johnson's Template assignment.
+
+#include <iostream>
+#include <stream>
+#include <string>
+
+using namespace std;
+
+

@@ -1,0 +1,65 @@
+//Program 4 redux with templates
+//Dallas Johnson
+//I put program 4 on hault for a while. ONce I finish this assignment, I'll use the code from this to finish the fourth program.
+//I hope I can do this at least, program 4's command parser is extremely broken as it is, and I wan to to try to nail this program down and kill two stones with one bird.
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <vector>
+#include "LL.h" //since I'm not original in any way... (totally joking, just needed to get the template written)
+#include "LLN.h"
+
+using namespace std;
+
+//Some advice I was told: code around your main method.
+
+AnyList<string> newList; //Not sure if you're supposed to prototype like you do normal classes...
+
+int main(int argc, char** argv) {
+//So now we must figure out how to write a command parser. Awesome...
+string command = "";
+cout << "Please enter a command: ";
+
+getline(cin, command);
+//This accepts the command and splits it. 
+vector<string> currentCommand = splitString(command);
+
+//here's our super advanced command checker.
+/*
+------
+Commands
+------
+ADD
+REMOVE
+PRINT
+EXIT
+*/
+if (currentCommand[0] == "ADD") {
+	if (currentCommand[1] != NULL && currentCommand[2] != NULL) {
+		//see above for this.
+		newList.head = new AnyNode<currentCommand[1]>(currentCommand[2], NULL);
+	}
+}
+
+//Now we know we'll need to split the strings. We'll use our delimiter as the space character.
+vector<string> splitString(string parseMe) {
+	char spc = ' ';
+	string word = "";
+	vector<string> parsedString;
+	//Loop through each word. If it hits the space, cut the word off.
+	
+	int pos = 0;
+	while(pos != parseMe.length()) {
+	
+	if ((char)parseMe[pos] == spc) {
+	
+	parsedString.push_back(word);
+	//once we push the word into the vector we need to clear the word again.
+	word = "";
+	} else {
+	word = word + parseMe[pos];
+	}
+    }
+	return parsedString;
+}

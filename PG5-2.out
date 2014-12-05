@@ -1,0 +1,331 @@
+Listing LL.h...
+
+//Linked List Template Class
+//Should be able to accept any type of class
+//Downside: Slow Code! :D
+#ifdef __LINKTEMPLATE__
+#define __LINKTEMPLATE__
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include "LLN.h"
+
+using namespace std;
+
+//Fitting name
+template <class t> class AnyList {
+
+//what variables should this hold?
+private:
+	t head;
+	//The size method may be obselete at this point.
+	//int size;
+public:
+//constructor
+	AnyList(t * newHead);
+//destructor
+	~AnyList();
+	void insert(int i, t * node); //Inserts an item before position i, preferrably a 'node'.
+	t get(int i); //Gets the info at the i'th node.
+	int length(); //Returns the length of our list. We could possibly do this recursively (and with templates... Shudder)
+
+	T & operator[] (int i);//Overloaded operator. This will essentially act like an array, even though t's a linked list.
+
+};
+
+template <class t> AnyList<t>::Anylist (t * newHead) {
+	//Our head must be a new node. These nodes can exist in many forms, so they'll be templated as well.
+
+	head = newHead;
+	size = 1;
+}
+
+template <class t> AnyList<t>::~Anylist() {
+
+	delete[] head;
+}
+
+template <class t> void AnyList<t>::insert(int i, t * node) {
+
+	//Now we use the length method we defined to make sure that we actually can do this.
+	if (length() < i) {
+	head->insertAfter(node, length()-1);
+	} else {
+	//If we can, we'll insert the node after the selected position.
+	head->insertAfter(node, i);
+	}
+}
+
+//I'm assuming that the instructions are to return the node at a position. This will do just that.
+template <class t> t AnyList<t>::get(int i) {
+
+	return head->get(0, i); //Zero as the first position always, i is the max.
+	//I did something a bit dirty with this, at least in my opinion.
+	//The node returns itself, so the operator overload just may do something a bit interesting hopefully with this idea.
+}
+
+template <class t> int length() {
+
+	//We'll have to increment this counter somehow. We could do it either from this list, or we could do it from the nodes. I'd prefer the list personally, but we'll see how life takes us.
+	return head->findLength();
+}
+
+template <class t> t & AnyList::operator[] (int i) {
+
+	//Since we're not dealing with an array, we need to also iterate the list to determine this.
+	//We could technically use the get method for this. Since I've not yet actually run this code at all to see if it truly works like I'm hoping, I'm going to assume that my little tricks I've used thusfar actually DO work and get all meta with this template.
+	t &x = head->get(0, i);
+	return x;
+}
+
+#endif
+
+
+
+Listing LLN.h...
+
+//Dallas Johnson
+//Template Code for the link list node
+//This will be interesting to write...
+
+#ifdef __LINKNODETEMPLATE__
+#define __LINKNODETEMPLATE__
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+template <class t> class AnyNode {
+
+private:
+//our variables that only the nodes will know about.
+	t next;
+	t info;
+public:
+//everything else the nodes should know about.
+//This also includes recursive methods that will be defined for the higher functions of the list itself.
+
+//constructor
+	AnyNode(t data, t nextNode);
+//Destructor
+	~AnyNode();
+	void insertAfter(t * nodePointer, int position, int currentPosition = 0); //We're inserting a node after the bracket number
+	int findLength(); //This will be the method that finds the length of the whole list recursively
+	t get(int currentPosition);
+};
+
+//Constructor fleshed out
+template <class t> AnyNode::AnyNode(t data, t * nextNode) {
+	info = data;
+	next = nextNode;
+}
+
+//I have a feeling this will blow up in my face.
+template <class t> ~AnyNode::AnyNode() {
+	if (next != NULL) {
+		delete[] next;
+	}
+}
+
+//This is where things get a bit fuzzy.
+template <class t> void AnyNode::insertAfter(t * nodePointer, int position, int currentPosition = 0) {
+//Hell yeah! Variable declaration in the method signature! This is important as well!
+	if (currentPosition == position) {
+		//Sliding into yo lists like (vine / twitter joke)
+		//Essentially adding that node into the list after the position. This is our base case.
+		nodePointer -> next = this.next;
+		this.next = nodePointer;
+		return;
+	}
+	else {
+		//I'm really hoping this will work. At this point I'm writing this without
+		//Even testing the program at all once.
+		next->insertAfter(nodePointer, position, currentPosition++);
+	}
+}
+
+//The recursive method that will return the lenght of the list to the list template.
+template <class t> int AnyNode::findLength() {
+	//start it at one, because we're counting this node.
+	int count = 1;
+	if (this.next == NULL) {
+	   return count;
+	} else {
+	   count++;
+	   next -> findLength();
+	}
+}
+
+//I forgot the get method
+template <class t> t AnyNode::get(int currentPosition, int max) {
+	pos = currentPosition;
+	//this is a rather meta way of doing it, since the user never interacts with the param. Just for recusrion's sake. currentPosition should always start at 0
+	if (currentPosition == max) {
+		return this;
+	} else {
+	//Here's the recursion.
+	next->get(pos++, max);
+}
+
+#endif
+
+
+
+Listing main.cpp...
+
+//Program 4 redux with templates
+//Dallas Johnson
+//I put program 4 on hault for a while. ONce I finish this assignment, I'll use the code from this to finish the fourth program.
+//I hope I can do this at least, program 4's command parser is extremely broken as it is, and I wan to to try to nail this program down and kill two stones with one bird.
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <vector>
+#include "LL.h" //since I'm not original in any way... (totally joking, just needed to get the template written)
+#include "LLN.h"
+
+using namespace std;
+
+//Some advice I was told: code around your main method.
+
+int main(int argc, char** argv) {
+//AnyList<string> newList(new AnyNode<string>("Our Head",NULL));
+//So now we must figure out how to write a command parser. Awesome...
+//Since the vector method isn't working for some reason (I hate templates so much) I'll try an array method.
+string command = "";
+string * commandSplit = new string[3];
+commandSplit[0] = commandSplit[1] = commandSplit[2] = "";
+cout << "Please enter a command: ";
+
+getline(cin, command);
+splitString(command);
+
+//here's our super advanced command checker.
+/*
+------
+Commands
+------
+ADD
+REMOVE
+PRINT
+EXIT
+*/
+if (commandSplit[0] == "ADD") {
+	if (commandSplit[1] != NULL && commandSplit[2] != NULL) {
+		//see above for this.
+		//newList.head = new AnyNode<currentCommand[1]>(currentCommand[2], NULL);
+		cout << "ADD WAS CALLED WITH : " << commandSplit[1] << " AND " << commandSplit[2] << " AS ARGS.";
+	}
+}
+}
+
+//Now we know we'll need to split the strings. We'll use our delimiter as the space character.
+
+//This will be kind of strange. It'll take in the string as a full string, then split it and put the parsed string into the command array. Different than I wanted to do it, but I want to get this done ASAP. Templates are awful.
+
+//;-;
+void splitString(string parseMe, string *& commandArray) {
+	//these three variables basically run the show. Space is obviuosly the space char, pos is our position in the word, and the current word is actually what we'll push onto the array. Ticker is the word we're currently on.
+	char space = " ";
+	int pos = 0;
+	string currentWord = "";
+	int ticker = 0;
+
+	while (pos < parseMe.length() && ticker != 3) { //While the position counter is less than the length, and the ticker is less than 3 (there shouldn't be more than three parameters to this anyhow) do everything below.
+	   if ((char)parseMe[pos] != space) {
+	      currentWord = currentWord + parseMe[pos];
+	   } else {
+		commandArray[ticker] = currentWord;
+		currentWord = ""; //clear the word once we push it.
+		ticker++; //Increment the ticker.
+	}
+	pos++;
+}
+
+
+
+
+
+/*vector<string> splitString(string parseMe) {
+	char spc = ' ';
+	string word = "";
+	vector<string> parsedString;
+	//Loop through each word. If it hits the space, cut the word off.
+
+	int pos = 0;
+	while(pos != parseMe.length()) {
+
+	if ((char)parseMe[pos] == spc) {
+
+	parsedString.push_back(word);
+	//once we push the word into the vector we need to clear the word again.
+	word = "";
+	} else {
+	word = word + parseMe[pos];
+	}
+    }
+	//returns a vector with the string split up.
+	return parsedString;
+}*/
+
+
+Listing main.h...
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <vector>
+#include "LL.h"
+#include "LLN.h"
+
+template <class t> class anyList;
+using namespace std;
+
+int main(int argc, char** argv);
+void splitString(string *& parseMe);
+
+
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Users\apoe\Desktop\Grading Folder>cppcompileall PG5.exe
+Microsoft Windows [Version 6.1.7601]
+Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+C:\Users\apoe\Desktop\Grading Folder>"C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
+Setting environment for using Microsoft Visual Studio 2010 x86 tools.
+
+C:\Users\apoe\Desktop\Grading Folder>cl /Tp "main.cpp" /O2 /EHsc /W2 /Za /link /OUT:PG5.exe
+main.cpp
+main.cpp(27) : error C3861: 'splitString': identifier not found
+main.cpp(40) : error C2678: binary '!=' : no operator found which takes a left-hand operand of type 'std::string' (or there is no acceptable conversion)
+        c:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE\system_error(425): could be 'bool std::operator !=(const std::error_code &,const std::error_condition &)'
+        c:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE\system_error(432): or       'bool std::operator !=(const std::error_condition &,const std::error_code &)'
+        while trying to match the argument list '(std::string, int)'
+main.cpp(40) : error C2678: binary '!=' : no operator found which takes a left-hand operand of type 'std::string' (or there is no acceptable conversion)
+        c:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE\system_error(425): could be 'bool std::operator !=(const std::error_code &,const std::error_condition &)'
+        c:\Program Files\Microsoft Visual Studio 10.0\VC\INCLUDE\system_error(432): or       'bool std::operator !=(const std::error_condition &,const std::error_code &)'
+        while trying to match the argument list '(std::string, int)'
+main.cpp(55) : error C2440: 'initializing' : cannot convert from 'const char [2]' to 'char'
+        There is no context in which this conversion is possible
+main.cpp(96) : fatal error C1075: end of file found before the left brace '{' at 'main.cpp(53)' was matched
+
+C:\Users\apoe\Desktop\Grading Folder>Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+C:\Users\apoe\Desktop\Grading Folder>PG5.exe < "C:\Grading\Classes\CS201-01-14F\PG5\PG5-1.in"
+'PG5.exe' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\apoe\Desktop\Grading Folder>exit
+
+DOES NOT COMPILE.
+
+0/50.
+
+Fix by Friday 5 December 2014.
